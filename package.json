@@ -1,0 +1,32 @@
+{
+  "name": "movie-price-tracker",
+  "version": "1.0.0",
+  "description": "A web scraper that monitors movie ticket prices on BookMyShow and sends email alerts when prices drop below target thresholds",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "movie",
+    "price",
+    "tracker",
+    "bookmyshow",
+    "scraper",
+    "email",
+    "notifications"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.18.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "puppeteer": "^21.11.0"
+  },
+  "type": "commonjs"
+}

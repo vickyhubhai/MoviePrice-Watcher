@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Price Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .movies-section {
+            margin-top: 30px;
+        }
+
+        .movies-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .movie-card.target-met {
+            border-left: 5px solid #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .movie-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .movie-info {
+            margin-bottom: 8px;
+            color: #6c757d;
+        }
+
+        .movie-info strong {
+            color: #2c3e50;
+        }
+
+        .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .price.target-met {
+            color: #28a745;
+        }
+
+        .movie-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .movie-actions .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+        }
+
+        .no-movies {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-movies i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎬 Movie Price Tracker</h1>
+            <p>Track BookMyShow movie ticket prices and get notified when they drop!</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalMovies">-</div>
+                <div class="stat-label">Total Movies</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pendingNotifications">-</div>
+                <div class="stat-label">Pending Alerts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="sentNotifications">-</div>
+                <div class="stat-label">Alerts Sent</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="recentlyChecked">-</div>
+                <div class="stat-label">Recently Checked</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Add Movie Form -->
+            <div class="form-section">
+                <h2>📎 Add Movie to Track</h2>
+                <div id="alertContainer"></div>
+                
+                <div class="form-row">
+                    <input type="url" id="movieUrl" placeholder="BookMyShow Movie URL" required>
+                    <input type="text" id="theater" placeholder="Theater Name (optional)">
+                    <input type="number" id="targetPrice" placeholder="Target Price (₹)" min="1" max="5000">
+                </div>
+                
+                <div>
+                    <button class="btn btn-primary" onclick="addMovie()">
+                        ➕ Add Movie
+                    </button>
+                    <button class="btn btn-success" onclick="checkPrices()">
+                        🔍 Check Prices Now
+                    </button>
+                    <button class="btn btn-secondary" onclick="testServices()">
+                        🧪 Test Services
+                    </button>
+                    <button class="btn btn-warning" onclick="sendTestEmail()">
+                        📧 Test Email
+                    </button>
+                </div>
+            </div>
+
+            <!-- Movies Section -->
+            <div class="movies-section">
+                <h2>📋 Tracked Movies</h2>
+                <div id="moviesContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading movies...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🤖 Real-time monitoring every minute | 🚀 Every 30 seconds during peak hours (9AM-11PM) | 📧 Instant email alerts</p>
+            <p>Last updated: <span id="lastUpdated">-</span></p>
+        </div>
+    </div>
+
+    <!-- Update Target Price Modal -->
+    <div id="updatePriceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h3>Update Target Price</h3>
+            </div>
+            <div>
+                <p>Movie: <strong id="modalMovieTitle">-</strong></p>
+                <div class="form-group">
+                    <input type="number" id="newTargetPrice" placeholder="New Target Price (₹)" min="1" max="5000">
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="confirmUpdatePrice()">Update Price</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMovieId = null;
+
+        // Load movies and stats on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMovies();
+            loadStats();
+            setInterval(loadStats, 60000); // Update stats every minute
+        });
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('totalMovies').textContent = result.data.totalMovies || 0;
+                    document.getElementById('pendingNotifications').textContent = result.data.pendingNotifications || 0;
+                    document.getElementById('sentNotifications').textContent = result.data.sentNotifications || 0;
+                    document.getElementById('recentlyChecked').textContent = result.data.recentlyChecked || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function addMovie() {
+            const url = document.getElementById('movieUrl').value;
+            const theater = document.getElementById('theater').value;
+            const targetPrice = document.getElementById('targetPrice').value;
+            
+            if (!url) {
+                showAlert('Please enter a movie URL', 'error');
+                return;
+            }
+            
+            try {
+                showAlert('Adding movie... This may take a moment.', 'info');
+                
+                const response = await fetch('/api/movies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, theater, targetPrice })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Movie added successfully!', 'success');
+                    document.getElementById('movieUrl').value = '';
+                    document.getElementById('theater').value = '';
+                    document.getElementById('targetPrice').value = '';
+                    loadMovies();
+                    loadStats();
+                } else {
+                    showAlert('Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error adding movie: ' + error.message, 'error');
+            }
+        }
+
+        async function checkPrices() {
+            try {
+                showAlert('Checking prices... This may take a few minutes.', 'info');
+                
+                const response = await fetch('/api/check-prices', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`Price check completed! Checked ${result.data.checkedCount} movies, sent ${result.data.alertsSent} alerts.`, 'success');
+                    loadMovies();
+                    loadStats();
+                } else {
+                    showAlert('Error checking prices: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function testServices() {
+            try {
+                showAlert('Testing services...', 'info');
+                
+                const response = await fetch('/api/test-services', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    const message = `Services test: Scraper ${data.scraper ? '✅' : '❌'}, Email ${data.email ? '✅' : '❌'}`;
+                    showAlert(message, data.overall ? 'success' : 'error');
+                } else {
+                    showAlert('Service test failed: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error testing services: ' + error.message, 'error');
+            }
+        }
+
+        async function sendTestEmail() {
+            try {
+                showAlert('Sending test email...', 'info');
+                
+                const response = await fetch('/api/test-email', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Test email sent successfully! Check your inbox.', 'success');
+                } else {
+                    showAlert('Failed to send test email: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error sending test email: ' + error.message, 'error');
+            }
+        }
+
+        async function loadMovies() {
+            try {
+                const response = await fetch('/api/movies');
+                const result = await response.json();
+                
+                const moviesContainer = document.getElementById('moviesContainer');
+                
+                if (result.success && result.data.length > 0) {
+                    const moviesHTML = result.data.map(movie => `
+                        <div class="movie-card ${movie.currentPrice <= movie.targetPrice ? 'target-met' : ''}">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-info"><strong>🏛️ Theater:</strong> ${movie.theater}</div>
+                            <div class="movie-info">
+                                <strong>💰 Current Price:</strong> 
+                                <span class="price ${movie.currentPrice <= movie.targetPrice ? 'target-met' : ''}">
+                                    ₹${movie.currentPrice || 'N/A'}
+                                </span>
+                            </div>
+                            <div class="movie-info"><strong>🎯 Target Price:</strong> ₹${movie.targetPrice}</div>
+                            <div class="movie-info"><strong>📅 Last Checked:</strong> ${new Date(movie.lastChecked).toLocaleString()}</div>
+                            <div class="movie-info">
+                                <strong>📧 Alert Status:</strong> 
+                                <span style="color: ${movie.notificationSent ? '#28a745' : '#ffc107'}">
+                                    ${movie.notificationSent ? '✅ Sent' : '⏳ Pending'}
+                                </span>
+                            </div>
+                            <div class="movie-actions">
+                                <button class="btn btn-primary" onclick="updateTargetPrice('${movie._id}', '${movie.title}')">
+                                    💰 Update Price
+                                </button>
+                                <button class="btn btn-success" onclick="openMovieUrl('${movie.url}')">
+                                    🎫 Book Now
+                                </button>
+                                <button class="btn btn-danger" onclick="removeMovie('${movie._id}', '${movie.title}')">
+                                    🗑️ Remove
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    moviesContainer.innerHTML = `<div class="movie-grid">${moviesHTML}</div>`;
+                } else {
+                    moviesContainer.innerHTML = `
+                        <div class="no-movies">
+                            <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">🎬</div>
+                            <h3>No movies being tracked yet</h3>
+                            <p>Add your first movie using the form above to get started!</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                document.getElementById('moviesContainer').innerHTML = `
+                    <div class="alert alert-error">
+                        Error loading movies: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function updateTargetPrice(movieId, movieTitle) {
+            currentMovieId = movieId;
+            document.getElementById('modalMovieTitle').textContent = movieTitle;
+            document.getElementById('updatePriceModal').style.display = 'block';
+        }
+
+        async function confirmUpdatePrice() {
+            const newPrice = document.getElementById('newTargetPrice').value;
+            
+            if (!newPrice || isNaN(newPrice) || newPrice <= 0) {
+                showAlert('Please enter a valid target price', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/movies/${currentMovieId}/target-price`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetPrice: parseInt(newPrice) })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Target price updated successfully!', 'success');
+                    closeModal();
+                    loadMovies();
+                    loadStats();
+                } else {
+                    showAlert('Error updating price: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function removeMovie(movieId, movieTitle) {
+            if (!confirm(`Are you sure you want to remove "${movieTitle}" from tracking?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/movies/${movieId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Movie removed successfully!', 'success');
+                    loadMovies();
+                    loadStats();
+                } else {
+                    showAlert('Error removing movie: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function openMovieUrl(url) {
+            window.open(url, '_blank');
+        }
+
+        function closeModal() {
+            document.getElementById('updatePriceModal').style.display = 'none';
+            document.getElementById('newTargetPrice').value = '';
+            currentMovieId = null;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('updatePriceModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
